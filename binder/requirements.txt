@@ -7,4 +7,3 @@ matplotlib
 cartopy
 zarr
 pystac-client
-dash[jupyter]
