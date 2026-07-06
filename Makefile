@@ -3,15 +3,22 @@
 IMAGE ?= binder-launcher
 SERVICE ?= launcher
 PORT ?= 8888
+WEB_PORT ?= 9090
+BLUE=\033[34m
+RESET=\033[0m
 
 run: up
+	@echo
+	@printf "JupyterLab:\n  $(BLUE)http://localhost:8888/lab$(RESET)\n\n"
+	@printf "Launcher Builder:\n  $(BLUE)http://localhost:8000/index.html?binderBase=local$(RESET)\n\n"
+	cd docs && python3 -m http.server $(WEB_PORT)
 
 
 build:
 	docker compose build --no-cache
 
 up:
-	docker compose up --build
+	docker compose up --build -d
 
 down:
 	docker compose down

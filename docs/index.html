@@ -54,6 +54,7 @@
       </option>
       <option value="https://binder.ethz.ch">ETH Binder</option>
       <option value-"https://notebooks.gesis.org/binder">GESIS Binder</option>
+      <option value="local">Local JupyterLab: http://localhost:8888</option>
       <option value="custom">Custom…</option>
     </select>
 
@@ -66,11 +67,6 @@
       />
     </div>
 
-    <!-- <label>Binder launcher repo</label> -->
-    <!-- <input id="launcherRepo" value="recap/binder-launcher" /> -->
-    <!---->
-    <!-- <label>Launcher version / branch / tag</label> -->
-    <!-- <input id="launcherRef" value="v0.1.1" /> -->
 
     <label>Target Git repo URL</label>
     <input id="targetRepo" placeholder="https://github.com/recap/DataLens" />
@@ -82,7 +78,7 @@
       </div>
       <div>
         <label>Notebook path and name</label>
-        <input id="notebookpath" placeholder="DataLens_EDA.ipynb" />
+        <input id="notebookpath" placeholder="DataLens.ipynb" />
       </div>
     </div>
 
@@ -98,13 +94,6 @@ CSV_URL=https://example.org/data.csv</textarea
 
 <button type="button" onclick="addDataFile()">+ Add file</button>
 
-    <!-- <label>Data staging JSON optional</label> -->
-    <!-- <textarea -->
-    <!--   id="data" -->
-    <!--   rows="5" -->
-    <!--   placeholder='[{"url":"https://example.org/data.csv","path":"data/data.csv"}]' -->
-    <!-- ></textarea> -->
-
     <br></br>
   <details>
   <summary>Advanced options</summary>
@@ -113,7 +102,7 @@ CSV_URL=https://example.org/data.csv</textarea
   <input id="launcherRepoAdvanced" value="recap/binder-launcher" />
 
   <label>Launcher version / branch / tag</label>
-  <input id="launcherRefAdvanced" value="v0.1.1" />
+  <input id="launcherRefAdvanced" value="latest" />
 
   <label>URL path</label>
   <input id="urlpath" value="lab/tree" />
@@ -153,30 +142,27 @@ CSV_URL=https://example.org/data.csv</textarea
         document.getElementById("customBinderContainer").style.display =
             custom ? "block" : "none";
     }
-    // function addDataFile(url = "", path = "") {
-    //     const container = document.getElementById("dataFiles");
-    //
-    //     const row = document.createElement("div");
-    //     row.className = "data-file-row";
-    //
-    //     row.innerHTML = `
-    //         <input
-    //             class="data-url"
-    //             placeholder="File URL"
-    //             value="${url}"
-    //         />
-    //
-    //         <input
-    //             class="data-path"
-    //             placeholder="Destination path (optional)"
-    //             value="${path}"
-    //         />
-    //
-    //         <button type="button" onclick="this.parentElement.remove()">✕</button>
-    //     `;
-    //
-    //     container.appendChild(row);
-    // }
+
+    function applyDefaultsFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+
+        const binder = params.get("binderBase");
+        if (!binder)
+            return;
+
+        const select = document.getElementById("binderBase");
+
+        // Does it match one of the predefined options?
+        const option = [...select.options].find(o => o.value === binder);
+
+        if (option) {
+            select.value = binder;
+        } else {
+            select.value = "custom";
+            document.getElementById("customBinderBase").value = binder;
+            toggleCustomBinder();
+        }
+    }
 
     function addDataFile(url = "", path = "") {
         const container = document.getElementById("dataFiles");
@@ -335,42 +321,33 @@ CSV_URL=https://example.org/data.csv</textarea
           if (key) inner.set(key, value);
         }
 
-        // if (dataText) {
-        //   try {
-        //     JSON.parse(dataText);
-        //     inner.set("data", dataText);
-        //   } catch {
-        //     alert("Data JSON is invalid");
-        //     return;
-        //   }
-        // }
-
         const launchUrlpath = "launch?" + inner.toString();
 
-        // const binderBase = document
-        //   .getElementById("binderBase")
-        //   .value.replace(/\/$/, "");
-      let binderBase = document.getElementById("binderBase").value;
+        let binderBase = document.getElementById("binderBase").value;
 
-      if (binderBase === "custom") {
-          binderBase = document.getElementById("customBinderBase").value.trim();
+        if (binderBase === "local") {
+          const localUrl = `http://localhost:8888/${launchUrlpath}`;
+          document.getElementById("output").textContent = localUrl;
+          return localUrl;
+        }
 
-          if (!binderBase) {
-              alert("Please enter a BinderHub URL.");
-              return;
-          }
-      }
 
-      binderBase = binderBase.replace(/\/$/, "");
+        if (binderBase === "custom") {
+            binderBase = document.getElementById("customBinderBase").value.trim();
+
+            if (!binderBase) {
+                alert("Please enter a BinderHub URL.");
+                return;
+            }
+        }
+
+        binderBase = binderBase.replace(/\/$/, "");
 
         const binderUrl =
           `${binderBase}/v2/gh/${launcherRepo}/${launcherRef}` +
           `?urlpath=${encodeURIComponent(launchUrlpath)}`;
 
-        // const badge = `[![Launch Binder](https://mybinder.org/badge_logo.svg)](${binderUrl})`;
-        //
         document.getElementById("output").textContent = binderUrl;
-        // document.getElementById("badge").textContent = badge;
       }
 
       async function copyUrl() {
@@ -379,6 +356,7 @@ CSV_URL=https://example.org/data.csv</textarea
         alert("Copied Binder URL");
       }
 
+      applyDefaultsFromUrl();
       buildUrl();
       addDataFile();
     </script>
