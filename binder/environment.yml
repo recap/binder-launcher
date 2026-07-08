@@ -21,10 +21,7 @@ dependencies:
   - fsspec
   - aiohttp
   - requests=2.34.2
-  - pip
   - sqlite
-  - pip:
-      - pysqlite
     #  - dask=2026.6.0
     #  - distributed=2026.6.0
     #  - pip=26.1.2
