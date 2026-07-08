@@ -1,9 +1,0 @@
-python-dotenv
-jupyter-server
-jupyterlab
-eodc
-openeo
-matplotlib
-cartopy
-zarr
-pystac-client
