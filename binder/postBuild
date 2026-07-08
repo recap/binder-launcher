@@ -20,7 +20,7 @@ EOF
 mkdir -p /home/jovyan/workspace
 
 "${KERNEL_PYTHON_PREFIX}/bin/jupyter" server extension list
-"${KERNEL_PYTHON_PREFIX}/bin/jupyter" lab build
+# "${KERNEL_PYTHON_PREFIX}/bin/jupyter" lab build
 
 
 
