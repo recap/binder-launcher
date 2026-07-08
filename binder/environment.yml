@@ -5,7 +5,7 @@ channels:
 
 dependencies:
   - python=3.12
-  - python_dotenv
+  - python-dotenv
   - jupyter_server
   - jupyterlab
   - cartopy=0.25.0
